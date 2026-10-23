@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, user-scalable=no" />
-    <title>AR Snow Queen - Minimal</title>
+    <title>AR Snow Queen - Video Test</title>
 
     <!-- A-Frame -->
     <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
@@ -34,8 +34,19 @@
 
     <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false;" vr-mode-ui="enabled: false">
       <a-marker preset="hiro">
-        <!-- Только модель, без видео и без шейдеров -->
+        <!-- Модель Snow Queen (она уже работает) -->
         <a-entity gltf-model="SnowQween.glb" scale="0.5 0.5 0.5" position="0 0 0"></a-entity>
+
+        <!-- Видео без шейдера: просто плоскость с видео -->
+        <a-plane
+          src="SnowQween.mp4"
+          crossorigin="anonymous"
+          width="1.2"
+          height="1.8"
+          position="0.8 0 -0.01"
+          rotation="0 90 0"
+          material="color: white">
+        </a-plane>
       </a-marker>
       <a-entity camera></a-entity>
     </a-scene>

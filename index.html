@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, user-scalable=no" />
+    <title>AR Snow Queen</title>
+
+    <!-- A-Frame -->
+    <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
+    <!-- AR.js для A-Frame -->
+    <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+
+    <style>
+      body { margin: 0; overflow: hidden; }
+      .arjs-loader {
+        position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0,0,0,0.6); color: #fff; font-family: monospace;
+        display: flex; justify-content: center; align-items: center;
+      }
+      .no-camera-msg {
+        position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+        text-align: center; color: #333; font-size: 18px;
+      }
+    </style>
+  </head>
+  <body>
+
+    <!-- Сообщение для ПК (нет камеры) -->
+    <div id="no-camera" class="no-camera-msg" style="display:none;">
+      AR недоступен на этом устройстве (нет камеры)<br>
+      Открой на телефоне.
+    </div>
+
+    <!-- Loader AR.js -->
+    <div class="arjs-loader">Наведи камеру на маркер Hiro</div>
+
+    <!-- Сцена AR -->
+    <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false;" vr-mode-ui="enabled: false">
+      <a-marker preset="hiro">
+        <!-- Модель Snow Queen -->
+        <a-entity gltf-model="SnowQween.glb" scale="0.5 0.5 0.5" position="0 0 0"></a-entity>
+
+        <!-- Видео с хромакеем: цвет под твой оттенок #00B140 -->
+        <a-video
+          src="SnowQween.mp4"
+          width="1.2"
+          height="1.8"
+          position="0.8 0 -0.01"
+          rotation="0 90 0"
+          play-on-click="false"
+          material="shader: chromakey; color: #00B140; tolerance: 0.28; sensitivity: 1.0;">
+        </a-video>
+      </a-marker>
+
+      <a-entity camera></a-entity>
+    </a-scene>
+
+    <!-- Регистрация шейдера chromakey с поддержкой твоего оттенка -->
+    <script>
+      AFRAME.registerShader('chromakey', {
+        schema: {
+          color: { type: 'color', default: '#00ff00' },
+          tolerance: { type: 'float', default: 0.25 },
+          sensitivity: { type: 'float', default: 1.0 }
+        },
+        init: function (data) {
+          this.material = new THREE.ShaderMaterial({
+            uniforms: {
+              uColor: { type: 'c', value: new THREE.Color(data.color) },
+              uTolerance: { type: 'f', value: data.tolerance },
+              uSensitivity: { type: 'f', value: data.sensitivity },
+              uMap: { type: 't', value: null }
+            },
+            vertexShader: `
+              varying vec2 vUv;
+              void main() {
+                vUv = uv;
+                gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+              }
+            `,
+            fragmentShader: `
+              uniform sampler2D uMap;
+              uniform vec3 uColor;
+              uniform float uTolerance;
+              uniform float uSensitivity;
+              varying vec2 vUv;
+
+              void main() {
+                vec3 texColor = texture2D(uMap, vUv).rgb;
+                float dist = distance(texColor, uColor);
+                float alpha = smoothstep(uTolerance, uTolerance + 0.1, dist * uSensitivity);
+                gl_FragColor = vec4(texColor, alpha);
+              }
+            `,
+            transparent: true,
+            blending: THREE.NormalBlending
+          });
+        },
+        update: function (data) {
+          if (this.material) {
+            this.material.uniforms.uColor.value.set(data.color);
+            this.material.uniforms.uTolerance.value = data.tolerance;
+            this.material.uniforms.uSensitivity.value = data.sensitivity;
+          }
+        },
+        attach: function () {
+          var videoEl = this.el.getObject3D('mesh').material.map.image;
+          this.material.uniforms.uMap.value = new THREE.VideoTexture(videoEl);
+        }
+      });
+    </script>
+
+    <!-- Проверка камеры: если её нет (ПК) — показываем заглушку, скрываем лоадер -->
+    <script>
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        document.getElementById('no-camera').style.display = 'block';
+        const loader = document.querySelector('.arjs-loader');
+        if (loader) loader.style.display = 'none';
+      }
+    </script>
+  </body>
+</html>

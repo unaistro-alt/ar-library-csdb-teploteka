@@ -30,18 +30,18 @@
 
     <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false;" vr-mode-ui="enabled: false">
       <a-marker preset="hiro">
-        <!-- Снежная королева — увеличена в 3 раза -->
+        <!-- Королева (передний план) -->
         <a-entity gltf-model="SnowQween.glb" scale="1.5 1.5 1.5" position="0 0 0"></a-entity>
 
-        <!-- Видео как фон — в 2 раза крупнее, сдвинуто по X, смотрит на камеру -->
+        <!-- Видео (фон, чуть позади, лицом к камере) -->
         <a-plane
           src="SnowQween.mp4"
           crossorigin="anonymous"
-          width="2.4"
-          height="3.6"
-          position="-2.0 1.0 -0.1"
+          width="4.0"
+          height="6.0"
+          position="-3.0 1.5 -1.0"
           rotation="0 90 0"
-          material="color: white">
+          material="shader: flat">
         </a-plane>
       </a-marker>
       <a-entity camera></a-entity>

@@ -25,9 +25,15 @@
 
     <div class="arjs-loader">Загрузка AR и видео...</div>
 
-    <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false;" 
-             renderer="colorManagement: true; physicallyCorrectLights: true;">
-      
+   <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false;">
+  <!-- Маркер Hiro: AR.js ищет этот узор -->
+  <a-marker preset="hiro">
+    <!-- Модель ТОЛЬКО здесь, внутри маркера -->
+    <a-entity gltf-model="url(SnowQween.glb)" scale="0.5 0.5 0.5"></a-entity>
+  </a-marker>
+
+  <!-- Видео-фон: оно может быть снаружи, оно играет всегда -->
+  <a-entity video-shader="src: #my-video; color: #000;" scale="2 2 2" position="0 0 -1"></a-entity>
       <!-- Вертикальная плоскость с видео ЗА королевой -->
       <a-plane 
         id="video-plane"

@@ -18,6 +18,14 @@
         display: flex; justify-content: center; align-items: center;
         z-index: 999;
       }
+      /* прячем исходный video-элемент: он нужен только как текстура,
+         показывать его на странице не надо */
+      #my-video {
+        position: absolute;
+        width: 1px; height: 1px;
+        opacity: 0;
+        pointer-events: none;
+      }
     </style>
   </head>
   <body>
@@ -49,7 +57,7 @@
         var l = document.querySelector('.arjs-loader');
         if (l) l.style.display = 'none';
       });
-      // страховка: если сцена не сообщила о готовности, прячем заглушку всё равно
+      // страховка: прячем заглушку в любом случае
       setTimeout(function () {
         var l = document.querySelector('.arjs-loader');
         if (l) l.style.display = 'none';

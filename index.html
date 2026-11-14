@@ -9,8 +9,6 @@
     <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
     <!-- AR.js -->
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
-    <!-- aframe-extras 6.x: совместим с A-Frame 1.4.0, содержит animation-mixer -->
-    <script src="https://cdn.jsdelivr.net/npm/aframe-extras@6.1.1/dist/aframe-extras.min.js"></script>
 
     <style>
       body { margin: 0; overflow: hidden; }
@@ -19,7 +17,6 @@
         background: rgba(0,0,0,0.6); color: #fff; font-family: monospace;
         display: flex; justify-content: center; align-items: center;
         z-index: 999;
-        pointer-events: none; /* не блокирует тапы, даже если зависнет */
       }
     </style>
   </head>
@@ -35,30 +32,23 @@
                crossorigin="anonymous"></video>
       </a-assets>
 
+      <!-- Маркер Hiro: видео-фон ЗА спиной Королевы, оба двигаются вместе -->
       <a-marker preset="hiro" emitevents="true">
+        <!-- вертикальная видео-плоскость позади модели -->
         <a-video src="#my-video" width="2" height="3.5" position="0 1.2 -1.5"></a-video>
-        <a-entity
-          gltf-model="url(SnowQweenAnimation.glb)"
-          animation-mixer="clip: *; loop: repeat"
-          scale="2 2 2">
-        </a-entity>
+        <!-- Королева -->
+        <a-entity gltf-model="url(SnowQweenAnimation.glb)" scale="2 2 2"></a-entity>
       </a-marker>
 
       <a-entity camera></a-entity>
     </a-scene>
 
     <script>
-      function hideLoader() {
+      // прячем заглушку, когда сцена готова
+      document.querySelector('a-scene').addEventListener('loaded', function () {
         var l = document.querySelector('.arjs-loader');
         if (l) l.style.display = 'none';
-      }
-
-      // 1. AR.js даёт событие, когда видео с камеры реально стартовало
-      window.addEventListener('arjs-video-loaded', hideLoader);
-
-      // 2. Страховка: если событие не пришло (или сцена уже была готова),
-      //    прячем заглушку по таймауту в любом случае
-      setTimeout(hideLoader, 4000);
+      });
     </script>
   </body>
 </html>

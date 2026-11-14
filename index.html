@@ -9,6 +9,8 @@
     <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
     <!-- AR.js -->
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+    <!-- aframe-extras: нужен для animation-mixer -->
+    <script src="https://cdn.jsdelivr.net/npm/aframe-extras@7.2.0/dist/aframe-extras.min.js"></script>
 
     <style>
       body { margin: 0; overflow: hidden; }
@@ -36,15 +38,19 @@
       <a-marker preset="hiro" emitevents="true">
         <!-- вертикальная видео-плоскость позади модели -->
         <a-video src="#my-video" width="2" height="3.5" position="0 1.2 -1.5"></a-video>
-        <!-- Королева -->
-        <a-entity gltf-model="url(SnowQween.glb)" scale="2 2 2"></a-entity>
+        <!-- Анимированная Королева -->
+        <a-entity
+          gltf-model="url(SnowQweenAnimation.glb)"
+          animation-mixer="clip: *; loop: repeat"
+          scale="2 2 2">
+        </a-entity>
       </a-marker>
 
       <a-entity camera></a-entity>
     </a-scene>
 
     <script>
-      // прячем заглушку, когда сцена готова
+      // прячем заглушку, когда сцена готовa
       document.querySelector('a-scene').addEventListener('loaded', function () {
         var l = document.querySelector('.arjs-loader');
         if (l) l.style.display = 'none';

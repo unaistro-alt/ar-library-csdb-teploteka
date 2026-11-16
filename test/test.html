@@ -2,21 +2,38 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <title>Тест AR</title>
-    <!-- A-Frame с jsDelivr вместо aframe.io -->
-    <script src="https://cdn.jsdelivr.net/npm/aframe@1.4.0/dist/aframe.min.js"></script>
-    <!-- AR.js с jsDelivr -->
-    <script src="https://cdn.jsdelivr.net/npm/@ar-js-org/ar.js@3.4.5/aframe/build/aframe-ar.js"></script>
-    <style>
-      body { margin: 0; overflow: hidden; }
-    </style>
+    <title>Диагностика загрузки</title>
+    <script>
+      window.onerror = function(msg, src, line) {
+        var d = document.createElement('div');
+        d.style.cssText = 'color:#b00020;font-size:16px;padding:4px;font-family:monospace;';
+        d.textContent = 'ОШИБКА: ' + msg + ' (' + (src || '') + ':' + line + ')';
+        document.body.appendChild(d);
+      };
+      function mark(text, ok) {
+        var d = document.createElement('div');
+        d.style.cssText = 'font-size:18px;padding:6px;font-family:sans-serif;color:' + (ok ? '#0a7d0a' : '#b00020');
+        d.textContent = (ok ? 'OK: ' : 'НЕ ЗАГРУЗИЛОСЬ: ') + text;
+        document.body.appendChild(d);
+      }
+    </script>
   </head>
-  <body>
-    <a-scene embedded arjs="sourceType: webcam;">
-      <a-marker preset="hiro">
-        <a-box position="0 0.5 0" material="color: red;"></a-box>
-      </a-marker>
-      <a-entity camera></a-entity>
-    </a-scene>
+  <body style="margin:10px; background:#fff;">
+    <h3>Диагностика:</h3>
+    <script>
+      mark('HTML отрисован', true);
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/aframe@1.4.0/dist/aframe.min.js"
+            onload="mark('A-Frame 1.4.0', true)"
+            onerror="mark('A-Frame 1.4.0', false)"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@ar-js-org/ar.js@3.4.5/aframe/build/aframe-ar.js"
+            onload="mark('AR.js 3.4.5', true)"
+            onerror="mark('AR.js 3.4.5', false)"></script>
+    <script>
+      window.addEventListener('load', function() {
+        if (window.AFRAME) { mark('AFRAME определён, версия: ' + AFRAME.version, true); }
+        else { mark('AFRAME не определён', false); }
+      });
+    </script>
   </body>
 </html>

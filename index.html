@@ -5,10 +5,11 @@
     <meta name="viewport" content="width=device-width, user-scalable=no" />
     <title>AR Snow Queen — Fixed</title>
 
-    <!-- A-Frame 1.3.0 — совместимая с AR.js версия -->
-    <script src="https://cdn.jsdelivr.net/npm/aframe@1.3.0/dist/aframe.min.js"></script>
-    <!-- AR.js 3.4.8 -->
-    <script src="https://raw.githack.com/AR-js-org/AR.js@3.4.8/aframe/build/aframe-ar.js"></script>
+    <!-- Живые источники (проверены на твоём телефоне) -->
+    <script src="https://cdn.jsdelivr.net/npm/aframe@1.4.0/dist/aframe-master.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@ar-js-org/ar.js@3.4.5/aframe/build/aframe-ar.js"></script>
+    <!-- animation-mixer для проигрывания анимации из GLB -->
+    <script src="https://cdn.jsdelivr.net/npm/aframe-extras@7.2.0/dist/aframe-extras.min.js"></script>
 
     <style>
       body { margin: 0; overflow: hidden; }
@@ -24,7 +25,6 @@
         opacity: 0;
         pointer-events: none;
       }
-      /* экран ошибок: виден сразу, без консоли */
       #err-box {
         position: absolute; top: 0; left: 0;
         max-width: 100%;
@@ -47,11 +47,14 @@
                src="SnowQween.mp4"
                autoplay loop muted playsinline
                crossorigin="anonymous"></video>
+        <a-asset-item id="queen" src="SnowQweenAnimation.glb"></a-asset-item>
       </a-assets>
 
       <a-marker preset="hiro" emitevents="true">
         <a-video src="#my-video" width="2" height="3.5" position="0 1.2 -1.5"></a-video>
-        <a-entity gltf-model="url(SnowQweenAnimation.glb)" scale="2 2 2"></a-entity>
+        <a-entity gltf-model="#queen"
+                  animation-mixer="clip: *; loop: repeat"
+                  scale="2 2 2"></a-entity>
       </a-marker>
 
       <a-entity camera></a-entity>
@@ -63,7 +66,6 @@
         errBox.style.display = 'block';
         errBox.textContent += msg + '\n';
       }
-      // все необработанные ошибки и отклонённые промисы — на экран
       window.onerror = function (msg, src, line) {
         showErr('ОШИБКА: ' + msg + ' (' + src + ':' + line + ')');
       };

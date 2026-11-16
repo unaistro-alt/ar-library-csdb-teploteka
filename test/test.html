@@ -2,14 +2,8 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <title>Диагностика загрузки</title>
+    <title>Поиск живого CDN</title>
     <script>
-      window.onerror = function(msg, src, line) {
-        var d = document.createElement('div');
-        d.style.cssText = 'color:#b00020;font-size:16px;padding:4px;font-family:monospace;';
-        d.textContent = 'ОШИБКА: ' + msg + ' (' + (src || '') + ':' + line + ')';
-        document.body.appendChild(d);
-      };
       function mark(text, ok) {
         var d = document.createElement('div');
         d.style.cssText = 'font-size:18px;padding:6px;font-family:sans-serif;color:' + (ok ? '#0a7d0a' : '#b00020');
@@ -19,20 +13,20 @@
     </script>
   </head>
   <body style="margin:10px; background:#fff;">
-    <h3>Диагностика:</h3>
-    <script>
-      mark('HTML отрисован', true);
-    </script>
+    <h3>Проверка CDN для A-Frame:</h3>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/aframe/1.4.0/aframe.min.js"
+            onload="mark('Вариант 1: cdnjs', true)"
+            onerror="mark('Вариант 1: cdnjs', false)"></script>
+    <script src="https://unpkg.com/aframe@1.4.0/dist/aframe.min.js"
+            onload="mark('Вариант 2: unpkg', true)"
+            onerror="mark('Вариант 2: unpkg', false)"></script>
     <script src="https://cdn.jsdelivr.net/npm/aframe@1.4.0/dist/aframe.min.js"
-            onload="mark('A-Frame 1.4.0', true)"
-            onerror="mark('A-Frame 1.4.0', false)"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@ar-js-org/ar.js@3.4.5/aframe/build/aframe-ar.js"
-            onload="mark('AR.js 3.4.5', true)"
-            onerror="mark('AR.js 3.4.5', false)"></script>
+            onload="mark('Вариант 3: jsDelivr', true)"
+            onerror="mark('Вариант 3: jsDelivr', false)"></script>
     <script>
       window.addEventListener('load', function() {
-        if (window.AFRAME) { mark('AFRAME определён, версия: ' + AFRAME.version, true); }
-        else { mark('AFRAME не определён', false); }
+        if (window.AFRAME) { mark('AFRAME готов, версия ' + AFRAME.version, true); }
+        else { mark('AFRAME так и не определился', false); }
       });
     </script>
   </body>

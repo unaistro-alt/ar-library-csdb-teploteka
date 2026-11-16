@@ -2,32 +2,55 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <title>Поиск живого CDN</title>
-    <script>
-      function mark(text, ok) {
-        var d = document.createElement('div');
-        d.style.cssText = 'font-size:18px;padding:6px;font-family:sans-serif;color:' + (ok ? '#0a7d0a' : '#b00020');
-        d.textContent = (ok ? 'OK: ' : 'НЕ ЗАГРУЗИЛОСЬ: ') + text;
-        document.body.appendChild(d);
-      }
-    </script>
+    <title>Тест AR — авто-загрузчик</title>
+    <style>
+      body { margin: 0; overflow: hidden; background: #000; }
+      #log { position: fixed; top: 0; left: 0; z-index: 99999;
+             font: 14px monospace; color: #fff; text-shadow: 0 0 4px #000; padding: 10px; }
+    </style>
   </head>
-  <body style="margin:10px; background:#fff;">
-    <h3>Проверка CDN для A-Frame:</h3>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/aframe/1.4.0/aframe.min.js"
-            onload="mark('Вариант 1: cdnjs', true)"
-            onerror="mark('Вариант 1: cdnjs', false)"></script>
-    <script src="https://unpkg.com/aframe@1.4.0/dist/aframe.min.js"
-            onload="mark('Вариант 2: unpkg', true)"
-            onerror="mark('Вариант 2: unpkg', false)"></script>
-    <script src="https://cdn.jsdelivr.net/npm/aframe@1.4.0/dist/aframe.min.js"
-            onload="mark('Вариант 3: jsDelivr', true)"
-            onerror="mark('Вариант 3: jsDelivr', false)"></script>
+  <body>
+    <div id="log">Загрузка…</div>
+
+    <!-- Сцена уже в коде: она «оживёт», когда библиотеки загрузятся -->
+    <a-scene embedded arjs="sourceType: webcam;">
+      <a-marker preset="hiro">
+        <a-box position="0 0.5 0" material="color: red;"></a-box>
+      </a-marker>
+      <a-entity camera></a-entity>
+    </a-scene>
+
     <script>
-      window.addEventListener('load', function() {
-        if (window.AFRAME) { mark('AFRAME готов, версия ' + AFRAME.version, true); }
-        else { mark('AFRAME так и не определился', false); }
-      });
+      var log = function(t) {
+        document.getElementById('log').innerHTML += t + '<br>';
+      };
+
+      // Три запасных источника A-Frame: правильные пути к файлам
+      var sources = [
+        'https://cdn.jsdelivr.net/npm/aframe@1.4.0/dist/aframe-master.min.js',
+        'https://cdnjs.cloudflare.com/ajax/libs/aframe/1.4.0/aframe.min.js',
+        'https://unpkg.com/aframe@1.4.0/dist/aframe-master.min.js'
+      ];
+
+      function tryLoad(i) {
+        if (i >= sources.length) { log('НИ ОДИН CDN НЕ ПОДШЁЛ'); return; }
+        log('Пробую источник ' + (i + 1) + ' из ' + sources.length + '…');
+        var s = document.createElement('script');
+        s.src = sources[i];
+        s.onload = function() { log('Источник ' + (i + 1) + ' загрузился!'); loadAR(); };
+        s.onerror = function() { log('Источник ' + (i + 1) + ' не отвечает'); tryLoad(i + 1); };
+        document.head.appendChild(s);
+      }
+
+      function loadAR() {
+        var s = document.createElement('script');
+        s.src = 'https://cdn.jsdelivr.net/npm/@ar-js-org/ar.js@3.4.5/aframe/build/aframe-ar.js';
+        s.onload = function() { log('AR.js готов. Разреши камеру и наведи на маркер Хиро!'); };
+        s.onerror = function() { log('AR.js не загрузился'); };
+        document.head.appendChild(s);
+      }
+
+      tryLoad(0);
     </script>
   </body>
 </html>

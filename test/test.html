@@ -2,55 +2,38 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <title>Тест AR — авто-загрузчик</title>
+    <title>Тест камеры</title>
     <style>
-      body { margin: 0; overflow: hidden; background: #000; }
-      #log { position: fixed; top: 0; left: 0; z-index: 99999;
-             font: 14px monospace; color: #fff; text-shadow: 0 0 4px #000; padding: 10px; }
+      body { margin: 0; background: #111; color: #fff; font-family: sans-serif; }
+      #log { padding: 12px; font-size: 15px; white-space: pre-wrap; }
+      #btn { margin: 12px; padding: 14px 20px; font-size: 17px; }
+      video { width: 100%; max-width: 480px; display: block; margin: 10px; }
     </style>
   </head>
   <body>
-    <div id="log">Загрузка…</div>
-
-    <!-- Сцена уже в коде: она «оживёт», когда библиотеки загрузятся -->
-    <a-scene embedded arjs="sourceType: webcam;">
-      <a-marker preset="hiro">
-        <a-box position="0 0.5 0" material="color: red;"></a-box>
-      </a-marker>
-      <a-entity camera></a-entity>
-    </a-scene>
+    <button id="btn">Проверить камеру</button>
+    <video id="video" autoplay playsinline muted></video>
+    <div id="log">Жду нажатия кнопки…</div>
 
     <script>
       var log = function(t) {
-        document.getElementById('log').innerHTML += t + '<br>';
+        document.getElementById('log').textContent += '\n' + t;
       };
-
-      // Три запасных источника A-Frame: правильные пути к файлам
-      var sources = [
-        'https://cdn.jsdelivr.net/npm/aframe@1.4.0/dist/aframe-master.min.js',
-        'https://cdnjs.cloudflare.com/ajax/libs/aframe/1.4.0/aframe.min.js',
-        'https://unpkg.com/aframe@1.4.0/dist/aframe-master.min.js'
-      ];
-
-      function tryLoad(i) {
-        if (i >= sources.length) { log('НИ ОДИН CDN НЕ ПОДШЁЛ'); return; }
-        log('Пробую источник ' + (i + 1) + ' из ' + sources.length + '…');
-        var s = document.createElement('script');
-        s.src = sources[i];
-        s.onload = function() { log('Источник ' + (i + 1) + ' загрузился!'); loadAR(); };
-        s.onerror = function() { log('Источник ' + (i + 1) + ' не отвечает'); tryLoad(i + 1); };
-        document.head.appendChild(s);
-      }
-
-      function loadAR() {
-        var s = document.createElement('script');
-        s.src = 'https://cdn.jsdelivr.net/npm/@ar-js-org/ar.js@3.4.5/aframe/build/aframe-ar.js';
-        s.onload = function() { log('AR.js готов. Разреши камеру и наведи на маркер Хиро!'); };
-        s.onerror = function() { log('AR.js не загрузился'); };
-        document.head.appendChild(s);
-      }
-
-      tryLoad(0);
+      document.getElementById('btn').onclick = function() {
+        log('Пробую включить камеру…');
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+          log('ОШИБКА: getUserMedia не поддерживается этим браузером');
+          return;
+        }
+        navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' }, audio: false })
+          .then(function(stream) {
+            log('КАМЕРА ВКЛЮЧИЛАСЬ! Ниже должно быть живое видео.');
+            document.getElementById('video').srcObject = stream;
+          })
+          .catch(function(err) {
+            log('ОШИБКА КАМЕРЫ: ' + err.name + ' — ' + err.message);
+          });
+      };
     </script>
   </body>
 </html>
